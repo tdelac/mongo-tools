@@ -82,12 +82,16 @@ type General struct {
 
 // Struct holding verbosity-related options
 type Verbosity struct {
-	Verbose []bool `short:"v" long:"verbose" description:"more detailed log output (include multiple times for more verbosity, e.g. -vvvvv)"`
-	Quiet   bool   `long:"quiet" description:"hide all log output"`
+	Verbose  []bool `short:"v" description:"more detailed log output (include multiple times for more verbosity, e.g. -vvvvv)"`
+	VerboseN int    `long:"verbose" description:"more detailed log output (increase value of N for more verbosity)" optional:"true" optional-value:"1" value-name:"N"`
+	Quiet    bool   `long:"quiet" description:"hide all log output"`
 }
 
 func (v Verbosity) Level() int {
-	return len(v.Verbose)
+	if v.VerboseN <= 0 {
+		return len(v.Verbose)
+	}
+	return v.VerboseN
 }
 
 func (v Verbosity) IsQuiet() bool {
