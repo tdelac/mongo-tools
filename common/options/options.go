@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -138,6 +139,15 @@ type EnabledOptions struct {
 	Namespace  bool
 }
 
+func parseVal(val string) int {
+	idx := strings.Index(val, "=")
+	ret, err := strconv.Atoi(val[idx+1:])
+	if err != nil {
+		panic(fmt.Errorf("value was not a valid integer: %v", err))
+	}
+	return ret
+}
+
 // Ask for a new instance of tool options
 func New(appName, usageStr string, enabled EnabledOptions) *ToolOptions {
 	hiddenOpts := &HiddenOptions{
@@ -163,9 +173,11 @@ func New(appName, usageStr string, enabled EnabledOptions) *ToolOptions {
 	// Called when -v or --verbose is parsed
 	opts.SetVerbosity = func(val string) {
 		if i, err := strconv.Atoi(val); err == nil {
-			opts.VLevel = i // -v=N or --verbose=N
-		} else if matched, _ := regexp.MatchString("^v+$", val); matched {
+			opts.VLevel = opts.VLevel + i // -v=N or --verbose=N
+		} else if matched, _ := regexp.MatchString(`^v+$`, val); matched {
 			opts.VLevel = opts.VLevel + len(val) + 1 // Handles the -vvv cases
+		} else if matched, _ := regexp.MatchString(`v=[0-9]$`, val); matched {
+			opts.VLevel = parseVal(val) // I.e. -vv=3
 		} else {
 			opts.VLevel = opts.VLevel + 1 // Increment for every occurrence of flag
 		}
