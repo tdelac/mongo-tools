@@ -85,11 +85,11 @@ type General struct {
 type Verbosity struct {
 	SetVerbosity func(string) `short:"v" long:"verbose" description:"more detailed log output (include multiple times for more verbosity, e.g. -vvvvv, or specify a numeric value, e.g. --verbose=N)" optional:"true" optional-value:""`
 	Quiet        bool         `long:"quiet" description:"hide all log output"`
-	Verbosity    int          `no-flag:"true"`
+	VLevel       int          `no-flag:"true"`
 }
 
 func (v Verbosity) Level() int {
-	return v.Verbosity
+	return v.VLevel
 }
 
 func (v Verbosity) IsQuiet() bool {
@@ -163,11 +163,11 @@ func New(appName, usageStr string, enabled EnabledOptions) *ToolOptions {
 	// Called when -v or --verbose is parsed
 	opts.SetVerbosity = func(val string) {
 		if i, err := strconv.Atoi(val); err == nil {
-			opts.Verbosity = i // -v=N or --verbose=N
+			opts.VLevel = i // -v=N or --verbose=N
 		} else if matched, _ := regexp.MatchString("^v+$", val); matched {
-			opts.Verbosity = opts.Verbosity + len(val) + 1 // Handles the -vvv cases
+			opts.VLevel = opts.VLevel + len(val) + 1 // Handles the -vvv cases
 		} else {
-			opts.Verbosity = opts.Verbosity + 1 // Increment for every occurrence of flag
+			opts.VLevel = opts.VLevel + 1 // Increment for every occurrence of flag
 		}
 	}
 
