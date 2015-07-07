@@ -143,7 +143,7 @@ func parseVal(val string) int {
 	idx := strings.Index(val, "=")
 	ret, err := strconv.Atoi(val[idx+1:])
 	if err != nil {
-		panic(fmt.Errorf("value was not a valid integer: %v", err))
+		panic(fmt.Errorf("could not parse verbosity level as an integer: %v", err))
 	}
 	return ret
 }
@@ -176,10 +176,13 @@ func New(appName, usageStr string, enabled EnabledOptions) *ToolOptions {
 			opts.VLevel = opts.VLevel + i // -v=N or --verbose=N
 		} else if matched, _ := regexp.MatchString(`^v+$`, val); matched {
 			opts.VLevel = opts.VLevel + len(val) + 1 // Handles the -vvv cases
-		} else if matched, _ := regexp.MatchString(`v=[0-9]$`, val); matched {
+		} else if matched, _ := regexp.MatchString(`^v+=[0-9]$`, val); matched {
 			opts.VLevel = parseVal(val) // I.e. -vv=3
-		} else {
+		} else if val == "" {
 			opts.VLevel = opts.VLevel + 1 // Increment for every occurrence of flag
+		} else {
+			fmt.Printf("Invalid verbosity value given")
+			os.Exit(-1)
 		}
 	}
 
