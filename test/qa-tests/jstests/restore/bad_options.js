@@ -38,6 +38,7 @@
     // run restore with an invalid verbosity value
     ret = toolTest.runTool.apply(toolTest,['restore', '-v', 'torvalds'].
             concat(getRestoreTarget('restore/testdata/dump_empty')));
+    assert.neq(0, ret);
 
     // success
     toolTest.stop();
