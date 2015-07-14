@@ -181,7 +181,7 @@ func New(appName, usageStr string, enabled EnabledOptions) *ToolOptions {
 		} else if val == "" {
 			opts.VLevel = opts.VLevel + 1 // Increment for every occurrence of flag
 		} else {
-			fmt.Printf("Invalid verbosity value given")
+			log.Logf(log.Always, "Invalid verbosity value given")
 			os.Exit(-1)
 		}
 	}
